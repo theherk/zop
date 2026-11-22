@@ -1,0 +1,60 @@
+[tools]
+# The github backend gets the native arm64
+# build on macOS; the aqua entry for mdbook only has the Intel one.
+"github:rust-lang/mdBook" = "0.5.4"
+# Only for the docs checks in scripts/docs. Rust comes from your own toolchain.
+node = "lts"
+
+[tasks.build]
+description = "Build the release binary"
+run = "cargo build --release"
+
+[tasks.test]
+description = "Run every test"
+run = "cargo test"
+
+[tasks.fmt]
+description = "Format the code"
+run = "cargo fmt"
+
+[tasks.lint]
+description = "Check formatting and run clippy with warnings as errors"
+run = ["cargo fmt --check", "cargo clippy --all-targets -- -D warnings"]
+
+[tasks.install]
+description = "Install zop from this checkout"
+run = "cargo install --path . --locked"
+
+[tasks."docs:build"]
+description = "Build the book into ./book"
+run = "mdbook build docs/"
+
+[tasks."docs:serve"]
+description = "Serve the book with live reload and open it"
+run = "mdbook serve docs/ --open --port 4000"
+
+[tasks."docs:deps"]
+description = "Install the docs checker's npm dependencies"
+hide = true
+run = "npm --prefix scripts/docs ci --silent"
+
+[tasks."docs:links"]
+description = "Check every internal link and anchor, and that every page is in SUMMARY.md"
+run = "node scripts/docs/check-links.mjs docs"
+
+[tasks."docs:diagrams"]
+description = "Check that every mermaid diagram parses"
+depends = ["docs:deps"]
+run = "node scripts/docs/check-diagrams.mjs docs"
+
+[tasks."docs:check"]
+description = "Build the book and check its links and diagrams"
+depends = ["docs:build", "docs:links", "docs:diagrams"]
+
+[tasks.check]
+description = "Everything a change should pass: lint, test and the docs checks"
+depends = ["lint", "test", "docs:check"]
+
+[tasks.clean]
+description = "Remove build output"
+run = "cargo clean && rm -rf book scripts/docs/node_modules"

@@ -1,0 +1,28 @@
+[package]
+name = "zop"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+description = "Every project, ranked by use: list, refresh, and per-project tmp paths."
+repository = "https://github.com/theherk/zop"
+readme = "README.md"
+license = "MIT"
+
+[lib]
+name = "zop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "zop"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive", "env"] }
+clap_complete = "4"
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"

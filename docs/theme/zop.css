@@ -1,0 +1,11 @@
+.menu-bar .menu-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+}
+
+.menu-bar .menu-title img {
+  height: 1.4em;
+  width: auto;
+}

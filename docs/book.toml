@@ -1,0 +1,15 @@
+[book]
+title = "zop"
+authors = ["Adam Sherwood"]
+language = "en"
+src = "."
+
+[build]
+build-dir = "../book"
+
+[output.html]
+git-repository-url = "https://github.com/theherk/zop"
+edit-url-template = "https://github.com/theherk/zop/edit/main/docs/{path}"
+additional-css = ["theme/zop.css"]
+additional-js = ["theme/mermaid-init.js", "theme/docs-ui.js"]
+default-theme = "light"

@@ -1,0 +1,77 @@
+#!/usr/bin/expect -f
+# Drives a shell through the zop demo. Run it under `asciinema rec`; see record.sh.
+set timeout 20
+set env_file [lindex $argv 0]
+set stty_init "rows 26 cols 92"
+
+# Tcl's `sleep` doesn't read the pty, so output would arrive in bursts. Waiting inside
+# `expect` keeps draining it, which gives the recording its real timing.
+proc pause {secs} {
+    set until [expr {[clock milliseconds] + int($secs * 1000)}]
+    while {[clock milliseconds] < $until} {
+        expect -timeout 0 -re {.+} {}
+        after 10
+    }
+}
+proc type {text} {
+    foreach c [split $text ""] {
+        send -- $c
+        pause [expr {0.03 + rand() * 0.05}]
+    }
+}
+proc run {cmd {after 1.6}} {
+    type $cmd
+    pause 0.3
+    send "\r"
+    pause $after
+}
+proc note {text} {
+    type "# $text"
+    send "\r"
+    pause 1.0
+}
+
+log_user 0
+spawn bash --noprofile --rcfile $env_file -i
+log_user 1
+stty rows 26 cols 92
+pause 0.8
+
+note "find every repo under projects once"
+run {zop refresh --root projects}
+run {zop list --tilde} 2.4
+
+note "visit a couple, and they float to the top"
+run {zop visit projects/github.com/jdoe/notes} 0.6
+run {zop visit projects/github.com/acme/web} 0.6
+run {zop list --tilde | head -4} 2.4
+
+note "pick one with fzf, then cd"
+run {p() { local d; d=$(zop list --tilde | fzf) && cd "${d/#\~/$HOME}"; }} 0.4
+type "p"
+send "\r"
+# the whole ranked list first: visited projects lead, then the rest by path
+pause 3.5
+send "\033\[B"
+pause 0.6
+send "\033\[B"
+pause 0.6
+send "\033\[A"
+pause 0.6
+send "\033\[A"
+pause 1.0
+type "docs"
+pause 1.8
+send "\033\[B"
+pause 1.2
+send "\r"
+pause 1.0
+run {echo "${PWD#*/projects/}"} 1.8
+
+note "two repos called docs? ids keep them apart"
+run {zop list --json | jq -r '.projects[] | select(.name=="docs") | .id'} 3.0
+
+note "that is zop"
+pause 1.5
+send "exit\r"
+expect eof

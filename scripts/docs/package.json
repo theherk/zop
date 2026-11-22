@@ -1,0 +1,10 @@
+{
+  "name": "zop-docs-checks",
+  "private": true,
+  "type": "module",
+  "description": "Link and diagram checks for the zop book",
+  "dependencies": {
+    "jsdom": "31.0.1",
+    "mermaid": "11.17.2"
+  }
+}

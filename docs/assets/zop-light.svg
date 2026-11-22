@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="zop">
+  <title>zop</title>
+  <g transform="translate(256,256)">
+    <!-- gear ring -->
+    <circle cx="0" cy="0" r="190" fill="#acb0be"/>
+    <g>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(0)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(30)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(60)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(90)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(120)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(150)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(180)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(210)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(240)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(270)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(300)"/>
+      <circle cx="0" cy="-198" r="20" fill="#eff1f5" transform="rotate(330)"/>
+    </g>
+    <circle cx="0" cy="0" r="156" fill="#eff1f5"/>
+
+    <g transform="scale(2.3) translate(-64,-64)" fill="none" stroke-linejoin="round">
+      <!-- the z: three cubic beziers with round joins -->
+      <path d="M34 38 C50 36 78 36 94 38 C80 54 50 74 34 90 C50 92 78 92 94 90" stroke="#209fb5" stroke-width="14" stroke-linecap="round"/>
+      <!-- accents: a thin arc hugging each of the z's two corner tips, its ends crossing slightly onto the strokes -->
+      <g stroke="#fe640b" stroke-width="3" stroke-linecap="round">
+        <path d="M82.5 26.9 A16 16 0 1 1 92.7 54.0"/>
+        <path d="M82.5 26.9 A16 16 0 1 1 92.7 54.0" transform="rotate(180 64 64)"/>
+      </g>
+    </g>
+  </g>
+</svg>
