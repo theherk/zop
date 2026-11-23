@@ -69,7 +69,17 @@ enum Command {
 
 #[derive(Args, Debug)]
 struct CompletionsArgs {
-    shell: clap_complete::Shell,
+    shell: CompletionShell,
+}
+
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+enum CompletionShell {
+    Bash,
+    Elvish,
+    Fish,
+    Nushell,
+    Powershell,
+    Zsh,
 }
 
 #[derive(Args, Debug)]
@@ -345,7 +355,41 @@ fn run_inner(args: &[OsString]) -> Result<u8> {
         Command::Completions(args) => {
             let mut cmd = <Cli as clap::CommandFactory>::command();
             let mut script = Vec::new();
-            clap_complete::generate(args.shell, &mut cmd, "zop", &mut script);
+            match args.shell {
+                CompletionShell::Bash => clap_complete::generate(
+                    clap_complete::Shell::Bash,
+                    &mut cmd,
+                    "zop",
+                    &mut script,
+                ),
+                CompletionShell::Elvish => clap_complete::generate(
+                    clap_complete::Shell::Elvish,
+                    &mut cmd,
+                    "zop",
+                    &mut script,
+                ),
+                CompletionShell::Fish => clap_complete::generate(
+                    clap_complete::Shell::Fish,
+                    &mut cmd,
+                    "zop",
+                    &mut script,
+                ),
+                CompletionShell::Nushell => clap_complete::generate(
+                    clap_complete_nushell::Nushell,
+                    &mut cmd,
+                    "zop",
+                    &mut script,
+                ),
+                CompletionShell::Powershell => clap_complete::generate(
+                    clap_complete::Shell::PowerShell,
+                    &mut cmd,
+                    "zop",
+                    &mut script,
+                ),
+                CompletionShell::Zsh => {
+                    clap_complete::generate(clap_complete::Shell::Zsh, &mut cmd, "zop", &mut script)
+                }
+            }
             emit(&script)?;
             Ok(0)
         }
@@ -574,7 +618,7 @@ fn ensure_fresh(ctx: &Ctx, max_age: Option<Duration>) -> Result<()> {
              or put roots in the [refresh] section of the config",
         ));
     };
-    do_refresh(ctx, &inputs, &Mode::Implicit { max_age })
+    do_refresh(ctx, &inputs, &Mode::Implicit { max_age }).map(|_| ())
 }
 
 /// Inputs from `refresh` flags. With none given and a stored set, reuse the stored set,
@@ -616,23 +660,53 @@ fn cmd_refresh(ctx: &Ctx, args: &RefreshArgs) -> Result<u8> {
              section of the config",
         ));
     };
-    do_refresh(
+    let summary = do_refresh(
         ctx,
         &inputs,
         &Mode::Explicit {
             prune: !args.no_prune,
         },
     )?;
+    if let Some(summary) = summary {
+        eprintln!("zop: {summary}");
+    }
     Ok(0)
 }
 
-fn do_refresh(ctx: &Ctx, inputs: &Inputs, mode: &Mode) -> Result<()> {
+/// What a refresh found. Printed to stderr by an explicit `zop refresh`.
+struct Summary {
+    projects: usize,
+    worktrees: usize,
+    roots: usize,
+    adds: usize,
+}
+
+impl std::fmt::Display for Summary {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let plural =
+            |n: usize, one: &str, many: &str| format!("{n} {}", if n == 1 { one } else { many });
+        write!(f, "{}", plural(self.projects, "project", "projects"))?;
+        if self.worktrees > 0 {
+            write!(f, " ({})", plural(self.worktrees, "worktree", "worktrees"))?;
+        }
+        let mut from = Vec::new();
+        if self.roots > 0 {
+            from.push(plural(self.roots, "root", "roots"));
+        }
+        if self.adds > 0 {
+            from.push(plural(self.adds, "extra", "extras"));
+        }
+        write!(f, " from {}", from.join(" and "))
+    }
+}
+
+fn do_refresh(ctx: &Ctx, inputs: &Inputs, mode: &Mode) -> Result<Option<Summary>> {
     let lock = Lock::acquire(&ctx.index, LOCK_TIMEOUT)?;
 
     if let Mode::Implicit { max_age } = mode {
         let loaded = index::load(&ctx.index)?;
         if !needs_refresh(&loaded, &ctx.index, *max_age) {
-            return Ok(());
+            return Ok(None);
         }
     }
 
@@ -645,6 +719,16 @@ fn do_refresh(ctx: &Ctx, inputs: &Inputs, mode: &Mode) -> Result<()> {
     for warning in &outcome.warnings {
         eprintln!("zop: warning: {warning}");
     }
+    let summary = Summary {
+        projects: outcome.projects.len(),
+        worktrees: outcome
+            .projects
+            .iter()
+            .filter(|p| p.kind == discover::Kind::Worktree)
+            .count(),
+        roots: inputs.roots.len(),
+        adds: inputs.adds.len(),
+    };
     index::write_atomic(
         &ctx.index,
         &Index {
@@ -664,7 +748,7 @@ fn do_refresh(ctx: &Ctx, inputs: &Inputs, mode: &Mode) -> Result<()> {
             Err(e) => eprintln!("zop: warning: prune: {e}"),
         }
     }
-    Ok(())
+    Ok(Some(summary))
 }
 
 // ---------------------------------------------------------------------------------------

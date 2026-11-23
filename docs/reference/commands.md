@@ -46,7 +46,7 @@ Prints every project, ranked. See [Ranking and Visits](../concepts/ranking.md).
 
 ## `zop refresh`
 
-Rescans and rewrites the index, then prunes stale tmp state. See [Projects](../concepts/projects.md) and [Index and State](index-file.md).
+Rescans and rewrites the index, then prunes stale tmp state. When it finishes it prints a one-line summary on **stderr**, such as `zop: 9 projects (1 worktree) from 1 root`, and nothing on stdout. An implicit refresh from `list` prints no summary. See [Projects](../concepts/projects.md) and [Index and State](index-file.md).
 
 | Flag | Meaning |
 |---|---|
@@ -91,8 +91,8 @@ Runs `zoxide add -- PATH`. With `-` as `PATH`, it reads one path per line from s
 zop completions SHELL
 ```
 
-Prints a completion script for `bash`, `elvish`, `fish`, `powershell` or `zsh`. Nushell needs the separate `clap_complete_nushell` crate.
+Prints a completion script for `bash`, `elvish`, `fish`, `nushell`, `powershell` or `zsh`.
 
 ## Not supported
 
-`zop` does not descend into submodules or nested clones, has no flag for the id separator, and has no nushell completions.
+`zop` does not descend into submodules or nested clones, and has no flag for the id separator.

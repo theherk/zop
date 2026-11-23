@@ -38,7 +38,7 @@ stty rows 26 cols 92
 pause 0.8
 
 note "find every repo under projects once"
-run {zop refresh --root projects}
+run {zop refresh --root projects} 2.2
 run {zop list --tilde} 2.4
 
 note "visit a couple, and they float to the top"

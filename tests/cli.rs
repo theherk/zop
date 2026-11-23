@@ -973,3 +973,56 @@ fn a_non_utf8_config_path_is_used_not_dropped() {
     );
     assert!(stderr(&out).contains("cfg"), "{}", stderr(&out));
 }
+
+#[test]
+fn explicit_refresh_summarises_on_stderr_and_keeps_stdout_empty() {
+    let z = Zop::new();
+    z.repo("a");
+    z.repo("b");
+    let out = z.run(&["refresh", "--root", z.root.to_str().unwrap()]);
+    assert!(out.status.success(), "{}", stderr(&out));
+    assert_eq!(stdout(&out), "");
+    assert_eq!(stderr(&out).trim(), "zop: 2 projects from 1 root");
+}
+
+#[test]
+fn refresh_summary_counts_worktrees_and_extras() {
+    let z = Zop::new();
+    let main = z.repo("a");
+    git(&main, &["worktree", "add", "-q", "../a-wt", "-b", "wt"]);
+    let extra = z._guard.path().join("extra");
+    fs::create_dir(&extra).unwrap();
+    let out = z.run(&[
+        "refresh",
+        "--root",
+        z.root.to_str().unwrap(),
+        "--add",
+        extra.to_str().unwrap(),
+    ]);
+    assert_eq!(
+        stderr(&out).trim(),
+        "zop: 3 projects (1 worktree) from 1 root and 1 extra"
+    );
+}
+
+#[test]
+fn an_implicit_refresh_from_list_stays_silent() {
+    let z = Zop::new();
+    z.repo("a");
+    z.ok(&["refresh", "--root", z.root.to_str().unwrap()]);
+    age_index(&z);
+    let out = z.run(&["list", "--no-zoxide", "--refresh-if-older", "1h"]);
+    assert!(out.status.success());
+    assert_eq!(stderr(&out), "");
+}
+
+#[test]
+fn nushell_completions_are_available() {
+    let z = Zop::new();
+    let out = z.ok(&["completions", "nushell"]);
+    assert!(out.contains("export extern zop ["), "{out}");
+    assert!(out.contains("export extern \"zop list\" ["), "{out}");
+    for shell in ["bash", "elvish", "fish", "powershell", "zsh"] {
+        assert!(!z.ok(&["completions", shell]).is_empty(), "{shell}");
+    }
+}
