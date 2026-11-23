@@ -6,6 +6,7 @@
 
 - [Why zop](guide/why-zop.md)
 - [Integration](guide/integration.md)
+- [In use](guide/in-use.md)
 
 # Concepts
 

@@ -22,6 +22,16 @@ zop visit PATH                   # tell zoxide this project was opened
 
 The recording is made in a sandbox of made-up projects. `scripts/demo/record.sh` regenerates `docs/assets/demo.cast`.
 
+## In use
+
+`zop` is not a switcher. It is the list behind one. Each tool below draws its own picker and calls `zop visit` after a choice. The projects, their order and their ids come from `zop`.
+
+| Zellij, in Ghostty | WezTerm | Rex |
+|:---:|:---:|:---:|
+| ![Zellij session switcher fed by zop](docs/assets/demo-zellij.gif) | ![WezTerm workspace switcher fed by zop](docs/assets/demo-wezterm.gif) | ![Rex project switcher fed by zop](docs/assets/demo-rex.gif) |
+
+How each is wired up is on the [In use](docs/guide/in-use.md) page, with links to the scripts and configuration. Raycast, VS Codium and Emacs Projectile are not documented yet, but anything that can run a command and read lines can use `zop` now.
+
 ## Docs
 
 The documentation is an [mdBook](https://rust-lang.github.io/mdBook/) under [`docs/`](docs/). Start at [`docs/introduction.md`](docs/introduction.md), or read it on GitHub Pages.
