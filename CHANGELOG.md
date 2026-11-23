@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0](https://github.com/theherk/zop/compare/zop-0.1.0...zop-0.2.0) (2026-11-23)
+## [0.2.0](https://github.com/theherk/zop/compare/59af654...0.2.0) (2026-11-23)
 
 
 ### Features
