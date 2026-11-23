@@ -7,6 +7,8 @@ description = "Every project, ranked by use: list, refresh, and per-project tmp 
 repository = "https://github.com/theherk/zop"
 readme = "README.md"
 license = "MIT"
+keywords = ["projects", "zoxide", "cli", "workflow", "switcher"]
+categories = ["command-line-utilities", "development-tools"]
 
 [lib]
 name = "zop"
